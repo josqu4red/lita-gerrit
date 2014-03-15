@@ -60,17 +60,17 @@ module Lita
 
       def patchset_created(params)
         message = "gerrit: patchset %s has been uploaded by %s for project %s. Review is at %s"
-        message % [params["patchset"], params["uploader"], params["project"], params["changeurl"]]
+        message % [params["patchset"], params["uploader"], params["project"], params["change-url"]]
       end
 
       def comment_added(params)
         message = "gerrit(%s): %s commented %s (V:%s/CR:%s)"
-        message % [params["project"], params["author"], params["changeurl"], params["verified"], params["reviewed"]]
+        message % [params["project"], params["author"], params["change-url"], params["verified"], params["reviewed"]]
       end
 
       def change_merged(params)
         message = "gerrit: Merge of #{changeurl} by #{submitter} for project #{project}"
-        message % [params["changeurl"], params["submitted"], params["project"]]
+        message % [params["change-url"], params["submitted"], params["project"]]
       end
     end
 

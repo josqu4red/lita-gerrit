@@ -1,6 +1,6 @@
 # lita-gerrit
 
-**lita-gerrit** is a handler for [Lita](https://github.com/jimmycuadra/lita) that allows interaction with Gerrit code review.
+**lita-gerrit** is a handler for [Lita](https://github.com/jimmycuadra/lita) that allows interaction with Gerrit code review tool.
 
 It listens for patchset ids on the chat and for events on HTTP interface.
 
@@ -14,7 +14,7 @@ gem "lita-gerrit"
 
 ## Configuration
 
-* `url` (String) - Sprintf URL pattern of your Gerrit instance, with one `%s` which will be substituted with patchset ids.
+* `url` (String) - "sprintf" URL pattern of your Gerrit instance, with one `%s` which will be substituted with patchset id.
 
 ### Example
 
@@ -29,13 +29,22 @@ end
 ### Chat functions
 
 ```
-gerrit 4200
+lita > gerrit 42
+Review 42 is at https://gerrit.example.com/42
+
 ```
-Will show URL for Gerrit patch 4200 (`https://gerrit.example.com/4200` with the above config)
+(see above config)
 
 ### HTTP endpoints
 
-lita-gerrit will listen for events triggered by Gerrit hooks. An example hook is provided in [contrib](https://github.com/josqu4red/lita-gerrit/tree/master/contrib) directory.
+lita-gerrit listens for events triggered by Gerrit hooks. An example hook is provided in [contrib](https://github.com/josqu4red/lita-gerrit/tree/master/contrib) directory.
+
+Currently only these hooks are implemented:
+ * patchset_created
+ * comment_added
+ * change_merged
+
+See whole list of hooks in [Gerrit doc](https://gerrit-review.googlesource.com/Documentation/config-hooks.html)
 
 ## License
 

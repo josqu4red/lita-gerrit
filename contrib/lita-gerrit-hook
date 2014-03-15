@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+
+#
+## Lita gerrit handler
+#
+# Usage:
+#
+#  Symlink this script to Gerrit hook folder ($GERRIT_HOME/hooks/<hook_name>)
+#  Where <hook_name> is one of the list https://gerrit-review.googlesource.com/Documentation/config-hooks.html#_supported_hooks
+#
+#  e.g  ln -s lita-gerrit-hook $GERRIT_HOME/hooks/patchset-created to enable that hook
+#
+
+require "rubygems"
+require "net/http"
+require "getoptlong"
+
+lita_url = "http://localhost:8080/lita/gerrit"
+lita_room = "#my_chan"
+
+args = [
+  "CRVW", "VRID",
+  "abandoner", "author", "branch", "change", "change-url", "changer",
+  "cla-id", "comment", "commit", "is-draft", "new-topic", "newrev",
+  "old-topic", "oldrev", "patchset", "project", "reason", "refname",
+  "restorer", "reviewer", "submitter", "topic", "uploader", "user-id"
+]
+
+opts = GetoptLong.new(*args.map{ |arg| [ "--#{arg}", GetoptLong::REQUIRED_ARGUMENT] })
+
+options = {
+  "room" => lita_room,
+  "action" => File.basename($0)
+}
+
+opts.each do |opt, arg|
+  key = opt.gsub(/^--/, "")
+  options[key] = URI.encode(arg)
+end
+
+request = Net::HTTP.post_form(URI.parse(lita_url), options)
