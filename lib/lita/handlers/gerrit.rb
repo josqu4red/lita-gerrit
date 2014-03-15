@@ -5,7 +5,7 @@ module Lita
     class Gerrit < Handler
 
       def self.default_config(config)
-        config.url = nil
+        config.url = "https://gerrit.example.com/%s"
         config.default_room = nil
       end
 
@@ -14,14 +14,8 @@ module Lita
 
       # Simply concatenate config.url with 'id' from route regex
       def gerrit_url(response)
-        if Lita.config.handlers.gerrit.url
-          gerrit_url = Lita.config.handlers.gerrit.url.chomp("/")
-        else
-          raise "Gerrit URL must be defined ('config.handlers.gerrit.url')"
-        end
-
         patchset_id = response.matches.flatten.first
-        patchset_url = "#{gerrit_url}/#{patchset_id}"
+        patchset_url = Lita.config.handlers.gerrit.url % patchset_id
 
         response.reply("Review #{patchset_id} is at #{patchset_url}")
       rescue Exception => e
