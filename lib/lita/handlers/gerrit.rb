@@ -22,16 +22,16 @@ module Lita
         response.reply("Error: #{e.message}")
       end
 
+      #
       # Notify the creation/comment/merge/etc. of a Gerrit patchset
-      http.post "/lita/gerrit", :receive
+      #
 
-      def receive(request, response)
+      http.post "/gerrit/hooks", :hook
+
+      def hook(request, response)
         if request.params.has_key?("action")
           action = request.params["action"].gsub("-", "_").to_sym
-
-          unless respond_to?(action, true)
-            raise "Action #{action} is not supported by Gerrit handler"
-          end
+          raise "Action #{action} is not supported by Gerrit handler" unless respond_to?(action, true)
         else
           raise "Action must be defined in hook's parameters"
         end
@@ -56,10 +56,10 @@ module Lita
       private
 
       # List of supported hooks
-      # (https://gerrit-documentation.storage.googleapis.com/Documentation/2.7/config-hooks.html#_supported_hooks)
+      # (https://gerrit-review.googlesource.com/Documentation/config-hooks.html#_supported_hooks)
 
       def patchset_created(params)
-        message = "gerrit: patchset %s has been uploaded by %s for project %s. Review is at %s"
+        message = "gerrit: patchset %s has been uploaded by %s in %s. %s"
         message % [params["patchset"], params["uploader"], params["project"], params["change-url"]]
       end
 
@@ -69,7 +69,7 @@ module Lita
       end
 
       def change_merged(params)
-        message = "gerrit: Merge of #{changeurl} by #{submitter} for project #{project}"
+        message = "gerrit: Merge of %s by %s in %s"
         message % [params["change-url"], params["submitted"], params["project"]]
       end
     end

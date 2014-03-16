@@ -15,7 +15,7 @@ require "rubygems"
 require "net/http"
 require "getoptlong"
 
-lita_url = "http://localhost:8080/lita/gerrit"
+lita_url = "http://localhost:8080/gerrit/hooks"
 lita_room = "#my_chan"
 
 args = [
