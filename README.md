@@ -2,7 +2,9 @@
 
 **lita-gerrit** is a handler for [Lita](https://github.com/jimmycuadra/lita) that allows interaction with Gerrit code review tool.
 
-It listens for patchset ids on the chat and for events on HTTP interface.
+It allows to fetch Gerrit changes details from the chat and listens for hook events on HTTP interface.
+
+It depends on HTTParty because Gerrit uses HTTP digest authentication, which is not supported by Lita's built-in HTTP client, Faraday.
 
 ## Installation
 
@@ -14,13 +16,17 @@ gem "lita-gerrit"
 
 ## Configuration
 
-* `url` (String) - "sprintf" URL pattern of your Gerrit instance, with one `%s` which will be substituted with patchset id.
+* `url` (String) - Gerrit service URL
+* `username` (String) - Username for REST API
+* `password` (String) - Password for REST API
 
 ### Example
 
 ```ruby
 Lita.configure do |config|
-  config.handlers.gerrit.url = "https://gerrit.example.com/%s"
+  config.handlers.gerrit.url = "https://gerrit.example.com"
+  config.handlers.gerrit.username = "foo"
+  config.handlers.gerrit.password = "bar"
 end
 ```
 
@@ -30,10 +36,9 @@ end
 
 ```
 lita > gerrit 42
-Review 42 is at https://gerrit.example.com/42
-
+gerrit: Display debug informations with correct log level by John Doe in chef. http://gerrit.example.com/42
+(gerrit: <commit message> by <author> in <project>. <url>)
 ```
-(see above config)
 
 ### HTTP endpoints
 
@@ -44,7 +49,7 @@ Currently only these hooks are implemented:
  * comment_added
  * change_merged
 
-See whole list of hooks in [Gerrit doc](https://gerrit-review.googlesource.com/Documentation/config-hooks.html)
+See list of supported hooks in [Gerrit doc](https://gerrit-review.googlesource.com/Documentation/config-hooks.html)
 
 ## License
 

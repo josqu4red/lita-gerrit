@@ -3,8 +3,8 @@ Gem::Specification.new do |spec|
   spec.version       = "0.0.1"
   spec.authors       = ["Jonathan Amiez"]
   spec.email         = ["jonathan.amiez@gmail.com"]
-  spec.description   = "Notification from Gerrit hooks"
-  spec.summary       = "Display notifications when patch arre submitted, commented or merged in Gerrit"
+  spec.description   = "Gerrit API client and hook events handler"
+  spec.summary       = "Retrieve change status from chat and display events"
   spec.homepage      = "https://github.com/josqu4red/lita-gerrit"
   spec.license       = "MIT"
 
