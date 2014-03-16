@@ -1,23 +1,27 @@
 require "lita"
+require "httparty"
 
 module Lita
   module Handlers
     class Gerrit < Handler
+      include HTTParty
 
       def self.default_config(config)
-        config.url = "https://gerrit.example.com/%s"
+        config.url = "https://gerrit.example.com"
+        config.username = "foo"
+        config.password = "bar"
         config.default_room = nil
       end
 
-      # Display link to Gerrit patchset easily
-      route /gerrit\s+(\d+)/, :gerrit_url, help: { "gerrit <patchset #>" => "Displays link to gerrit patchset" }
+      #
+      # Fetch details of a given patchset
+      #
 
-      # Simply concatenate config.url with 'id' from route regex
-      def gerrit_url(response)
+      route /gerrit\s+(\d+)/, :change_details, help: { "gerrit <change #>" => "Displays details of a gerrit change" }
+
+      def change_details(response)
         patchset_id = response.matches.flatten.first
-        patchset_url = Lita.config.handlers.gerrit.url % patchset_id
-
-        response.reply("Review #{patchset_id} is at #{patchset_url}")
+        response.reply(get_change(patchset_id))
       rescue Exception => e
         response.reply("Error: #{e.message}")
       end
@@ -31,7 +35,10 @@ module Lita
       def hook(request, response)
         if request.params.has_key?("action")
           action = request.params["action"].gsub("-", "_").to_sym
-          raise "Action #{action} is not supported by Gerrit handler" unless respond_to?(action, true)
+
+          unless respond_to?(action, true)
+            raise "Action #{action} is not supported by Gerrit handler"
+          end
         else
           raise "Action must be defined in hook's parameters"
         end
@@ -71,6 +78,35 @@ module Lita
       def change_merged(params)
         message = "gerrit: Merge of %s by %s in %s"
         message % [params["change-url"], params["submitted"], params["project"]]
+      end
+
+      #
+      # Helpers
+      #
+
+      def get_change(id)
+        path = "#{Lita.config.handlers.gerrit.url.chomp("/")}/a/changes/#{id}"
+        http_resp = self.class.get(path, :digest_auth => digest_creds)
+
+        case http_resp.code
+        when 200
+          change = MultiJson.load(http_resp.body.lines.to_a[1..-1].join)
+          message = "gerrit: #{change["subject"]} by #{change["owner"]["name"]}"
+          message += " in #{change["project"]}. #{gerrit_link(id)}"
+        when 404
+          message = "Change ##{id} does not exist"
+        else
+          raise "Failed to fetch #{path} (#{http_resp.code})"
+        end
+        message
+      end
+
+      def digest_creds
+        { username: Lita.config.handlers.gerrit.username, password: Lita.config.handlers.gerrit.password }
+      end
+
+      def gerrit_link(id)
+        "#{Lita.config.handlers.gerrit.url.chomp("/")}/#{id}"
       end
     end
 
