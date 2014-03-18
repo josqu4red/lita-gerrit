@@ -4,7 +4,6 @@ require "httparty"
 module Lita
   module Handlers
     class Gerrit < Handler
-      include HTTParty
 
       def self.default_config(config)
         config.url = "https://gerrit.example.com"
@@ -20,8 +19,26 @@ module Lita
       route /gerrit\s+(\d+)/, :change_details, help: { "gerrit <change #>" => "Displays details of a gerrit change" }
 
       def change_details(response)
-        patchset_id = response.matches.flatten.first
-        response.reply(get_change(patchset_id))
+        change_id = response.matches.flatten.first
+        change_uri = "#{Lita.config.handlers.gerrit.url}/a/changes/#{change_id}"
+        change_link = URI.join(Lita.config.handlers.gerrit.url, change_id)
+
+        http_resp = HTTParty.get(change_uri, :digest_auth => {
+          username: Lita.config.handlers.gerrit.username,
+          password: Lita.config.handlers.gerrit.password
+        })
+
+        case http_resp.code
+        when 200
+          change = MultiJson.load(http_resp.body.lines.to_a[1..-1].join)
+          message = "gerrit: #{change["subject"]} by #{change["owner"]["name"]} in #{change["project"]}. #{change_link}"
+        when 404
+          message = "Change ##{change_id} does not exist"
+        else
+          raise "Failed to fetch #{change_uri} (#{http_resp.code})"
+        end
+
+        response.reply(message)
       rescue Exception => e
         response.reply("Error: #{e.message}")
       end
@@ -78,35 +95,6 @@ module Lita
       def change_merged(params)
         message = "gerrit: Merge of %s by %s in %s"
         message % [params["change-url"], params["submitted"], params["project"]]
-      end
-
-      #
-      # Helpers
-      #
-
-      def get_change(id)
-        path = "#{Lita.config.handlers.gerrit.url.chomp("/")}/a/changes/#{id}"
-        http_resp = self.class.get(path, :digest_auth => digest_creds)
-
-        case http_resp.code
-        when 200
-          change = MultiJson.load(http_resp.body.lines.to_a[1..-1].join)
-          message = "gerrit: #{change["subject"]} by #{change["owner"]["name"]}"
-          message += " in #{change["project"]}. #{gerrit_link(id)}"
-        when 404
-          message = "Change ##{id} does not exist"
-        else
-          raise "Failed to fetch #{path} (#{http_resp.code})"
-        end
-        message
-      end
-
-      def digest_creds
-        { username: Lita.config.handlers.gerrit.username, password: Lita.config.handlers.gerrit.password }
-      end
-
-      def gerrit_link(id)
-        "#{Lita.config.handlers.gerrit.url.chomp("/")}/#{id}"
       end
     end
 
