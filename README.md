@@ -1,5 +1,8 @@
 # lita-gerrit
 
+[![Build Status](https://travis-ci.org/josqu4red/lita-gerrit.png?branch=master)](https://travis-ci.org/josqu4red/lita-gerrit)
+[![Coverage Status](https://coveralls.io/repos/josqu4red/lita-gerrit/badge.png)](https://coveralls.io/r/josqu4red/lita-gerrit)
+
 **lita-gerrit** is a handler for [Lita](https://github.com/jimmycuadra/lita) that allows interaction with Gerrit code review tool.
 
 It allows to fetch Gerrit changes details from the chat and listens for hook events on HTTP interface.
