@@ -1,6 +1,3 @@
-require "lita"
-require "httparty"
-
 module Lita
   module Handlers
     class Gerrit < Handler
@@ -20,8 +17,8 @@ module Lita
 
       def change_details(response)
         change_id = response.matches.flatten.first
-        change_uri = URI.join(Lita.config.handlers.gerrit.url, "/a/changes/", change_id)
-        change_link = URI.join(Lita.config.handlers.gerrit.url, change_id)
+        change_uri = "#{Lita.config.handlers.gerrit.url.chomp("/")}/a/changes/#{change_id}"
+        change_link = "#{Lita.config.handlers.gerrit.url.chomp("/")}/#{change_id}"
 
         http_resp = HTTParty.get(change_uri, :digest_auth => {
           username: Lita.config.handlers.gerrit.username,
