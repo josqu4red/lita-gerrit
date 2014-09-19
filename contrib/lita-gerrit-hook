@@ -35,7 +35,7 @@ options = {
 
 opts.each do |opt, arg|
   key = opt.gsub(/^--/, "")
-  options[key] = URI.encode(arg)
+  options[key] = arg
 end
 
 request = Net::HTTP.post_form(URI.parse(lita_url), options)

@@ -91,7 +91,7 @@ module Lita
 
       def change_merged(params)
         message = "gerrit: Merge of %s by %s in %s"
-        message % [params["change-url"], params["submitted"], params["project"]]
+        message % [params["change-url"], params["submitter"], params["project"]]
       end
     end
 
