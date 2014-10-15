@@ -88,7 +88,7 @@ module Lita
 
         message = "jenkins: Build #{params["GERRIT_CHANGE_SUBJECT"]} by #{params["GERRIT_PATCHSET_UPLOADER_NAME"]} in #{params["GERRIT_PROJECT"]}"
 
-        if build["phase"] == "FINISHED"
+        if build["phase"] == "FINALIZED"
           case build["status"]
           when "FAILURE"
             message += " FAILED (#{build["full_url"]})"
