@@ -86,7 +86,7 @@ module Lita
         build = notification["build"]
         params = build["parameters"]
 
-        message = "jenkins: Build #{params["GERRIT_CHANGE_SUBJECT"]} by #{params["GERRIT_PATCHSET_UPLOADER_NAME"]} in #{params["GERRIT_PROJECT"]}"
+        message = "jenkins: Build \"#{params["GERRIT_CHANGE_SUBJECT"]}\" by #{params["GERRIT_PATCHSET_UPLOADER_NAME"]} in #{params["GERRIT_PROJECT"]}"
 
         if build["phase"] == "FINALIZED"
           case build["status"]
