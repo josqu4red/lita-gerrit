@@ -74,6 +74,37 @@ module Lita
         Lita.logger.error(e.message)
       end
 
+      #
+      # Notification from Jenkins build
+      #
+
+      http.post "/gerrit/build/:room", :build_notification
+
+      def build_notification(request, response)
+        target = Source.new(room: request.env["router.params"][:room])
+        notification = MultiJson.load(request.body.read)
+        build = notification["build"]
+        params = build["parameters"]
+
+        message = "jenkins: Build #{params["GERRIT_CHANGE_SUBJECT"]} by #{params["GERRIT_PATCHSET_UPLOADER_NAME"]} in #{params["GERRIT_PROJECT"]}"
+
+        if build["phase"] == "FINISHED"
+          case build["status"]
+          when "FAILURE"
+            message += " FAILED (#{build["full_url"]})"
+          when "SUCCESS"
+            message += " OK"
+          else
+            message += " UNKNOWN"
+          end
+
+          robot.send_message(target, message)
+        end
+
+      rescue Exception => e
+        robot.send_message(target, "Failed to process Gerrit build event (#{e.message})")
+      end
+
       private
 
       # List of supported hooks
