@@ -1,4 +1,5 @@
 require "spec_helper"
+require "stringio"
 
 describe Lita::Handlers::Gerrit, lita_handler: true do
 
@@ -43,6 +44,45 @@ describe Lita::Handlers::Gerrit, lita_handler: true do
       send_command("gerrit 42")
 
       expect(replies.last).to match("Error: Failed to fetch https://gerrit.example.com/a/changes/42 (500)")
+    end
+  end
+
+  it { routes_http(:post, "/gerrit/hooks").to(:hook) }
+
+  describe "#hook" do
+    let(:request) do
+      request = double("Rack::Request")
+      allow(request).to receive(:params).and_return(params)
+      request
+    end
+
+    let(:response) { Rack::Response.new }
+
+    let(:params) { double("Hash") }
+  end
+
+  it { routes_http(:post, "/gerrit/build/myroom").to(:build_notification) }
+  it { doesnt_route_http(:post, "/gerrit/build/").to(:build_notification) }
+
+  describe "#build_notification" do
+    let(:request) { double("Rack::Request") }
+    let(:response) { Rack::Response.new }
+    let(:env) { {"router.params" => { :room => "myroom" }} }
+    let(:body) { File.read("spec/fixtures/build_notification.json") }
+
+    context "build finalized" do
+      before do
+        allow(request).to receive(:env).and_return(env)
+        allow(request).to receive(:body).and_return(StringIO.new(body))
+      end
+
+      it "notifies the applicable room" do
+        expect(robot).to receive(:send_message) do |target, message|
+          expect(target.room).to eq("myroom")
+          expect(message).to eq('jenkins: Build "haproxy: enable HTTP compression on kibana frontend" by Hervé in sysadmin/chef OK')
+        end
+        subject.build_notification(request, response)
+      end
     end
   end
 end

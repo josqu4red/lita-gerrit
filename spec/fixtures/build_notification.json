@@ -1,0 +1,47 @@
+{
+  "name": "chef-gerrit_tests",
+  "url": "job/chef-gerrit_tests/",
+  "build": {
+    "full_url": "http://jenkins.example.loc/job/chef-gerrit_tests/315/",
+    "number": 315,
+    "phase": "FINALIZED",
+    "status": "SUCCESS",
+    "url": "job/chef-gerrit_tests/315/",
+    "scm": {
+      "url": "ssh://gerrit.example.loc:29418/sysadmin/chef.git",
+      "branch": "detached",
+      "commit": "f97200b5d5bbf5bd242f645f29e089e47fa51ff3"
+    },
+    "parameters": {
+      "GERRIT_HOST": "gerrit.example.loc",
+      "GERRIT_PATCHSET_UPLOADER": "\"Hervé\" <herve@example.com>",
+      "GERRIT_EVENT_ACCOUNT_NAME": "Hervé",
+      "GERRIT_EVENT_TYPE": "patchset-created",
+      "GERRIT_CHANGE_ID": "I29a79eae813c7662736dd1a1f9074cc316301918",
+      "GERRIT_TOPIC": "es_http_compress",
+      "GERRIT_CHANGE_NUMBER": "3705",
+      "GERRIT_VERSION": "2.8.1",
+      "GERRIT_PATCHSET_UPLOADER_NAME": "Hervé",
+      "GERRIT_CHANGE_COMMIT_MESSAGE": "aGFwcm94eTogZW5hYmxlIEhUVFAgY29tcHJlc3Npb24gb24ga2liYW5hIGZyb250ZW5kCgpDaGFuZ2UtSWQ6IEkyOWE3OWVhZTgxM2M3NjYyNzM2ZGQxYTFmOTA3NGNjMzE2MzAxOTE4Cg==",
+      "GERRIT_PATCHSET_UPLOADER_EMAIL": "herve@example.com",
+      "GERRIT_PORT": "29418",
+      "GERRIT_EVENT_HASH": "-108092174",
+      "GERRIT_BRANCH": "master",
+      "GERRIT_NAME": "gerrit.example.loc",
+      "GERRIT_CHANGE_OWNER_NAME": "Hervé",
+      "GERRIT_EVENT_ACCOUNT": "\"Hervé\" <herve@example.com>",
+      "GERRIT_EVENT_ACCOUNT_EMAIL": "herve@example.com",
+      "GERRIT_CHANGE_OWNER": "\"Hervé\" <herve@example.com>",
+      "GERRIT_CHANGE_URL": "http://gerrit.example.loc:8080/3705",
+      "GERRIT_SCHEME": "ssh",
+      "GERRIT_CHANGE_SUBJECT": "haproxy: enable HTTP compression on kibana frontend",
+      "GERRIT_REFSPEC": "refs/changes/05/3705/2",
+      "GERRIT_PATCHSET_NUMBER": "2",
+      "GERRIT_PATCHSET_REVISION": "f97200b5d5bbf5bd242f645f29e089e47fa51ff3",
+      "GERRIT_PROJECT": "sysadmin/chef",
+      "GERRIT_CHANGE_OWNER_EMAIL": "herve@example.com"
+    },
+    "artifacts": {
+    }
+  }
+}
