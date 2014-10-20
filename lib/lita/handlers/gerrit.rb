@@ -28,11 +28,11 @@ module Lita
         case http_resp.code
         when 200
           change = MultiJson.load(http_resp.body.lines.to_a[1..-1].join)
-          message = "gerrit: #{change["subject"]} by #{change["owner"]["name"]} in #{change["project"]}. #{change_link}"
+          message = "[gerrit] [#{change["project"]}] \"#{change["subject"]}\" by #{change["owner"]["name"]}. #{change_link}"
         when 404
-          message = "Change ##{change_id} does not exist"
+          message = "[gerrit] Change ##{change_id} does not exist"
         else
-          raise "Failed to fetch #{change_uri} (#{http_resp.code})"
+          raise "[gerrit] Failed to fetch #{change_uri} (#{http_resp.code})"
         end
 
         response.reply(message)
@@ -86,23 +86,24 @@ module Lita
         build = notification["build"]
         params = build["parameters"]
 
-        message = "jenkins: Build \"#{params["GERRIT_CHANGE_SUBJECT"]}\" by #{params["GERRIT_PATCHSET_UPLOADER_NAME"]} in #{params["GERRIT_PROJECT"]}"
+        message = "[jenkins] [#{params["GERRIT_PROJECT"]}] Build %s for \"#{params["GERRIT_CHANGE_SUBJECT"]}\" by #{params["GERRIT_PATCHSET_UPLOADER_NAME"]}"
 
         if build["phase"] == "FINALIZED"
           case build["status"]
           when "FAILURE"
-            message += " FAILED (#{build["full_url"]})"
+            message = message % "FAILED"
+            message += " (#{build["full_url"]})"
           when "SUCCESS"
-            message += " OK"
+            message = message % "OK"
           else
-            message += " UNKNOWN"
+            message = message % "UNKNOWN"
           end
 
           robot.send_message(target, message)
         end
 
       rescue Exception => e
-        robot.send_message(target, "Failed to process Gerrit build event (#{e.message})")
+        robot.send_message(target, "[jenkins] failed to process Gerrit build event (#{e.message})")
       end
 
       private
@@ -111,18 +112,18 @@ module Lita
       # (https://gerrit-review.googlesource.com/Documentation/config-hooks.html#_supported_hooks)
 
       def patchset_created(params)
-        message = "gerrit: patchset %s has been uploaded by %s in %s. %s"
-        message % [params["patchset"], params["uploader"], params["project"], params["change-url"]]
+        message = "[gerrit] [%s] %s uploaded patchset %s. %s"
+        message % [params["project"], params["uploader"], params["patchset"], params["change-url"]]
       end
 
       def comment_added(params)
-        message = "gerrit(%s): %s commented %s (V:%s/CR:%s)"
+        message = "[gerrit] [%s]: %s commented %s (V:%s/CR:%s)"
         message % [params["project"], params["author"], params["change-url"], params["verified"], params["reviewed"]]
       end
 
       def change_merged(params)
-        message = "gerrit: Merge of %s by %s in %s"
-        message % [params["change-url"], params["submitter"], params["project"]]
+        message = "[gerrit] [%s] %s merged %s"
+        message % [params["project"], params["submitter"], params["change-url"]]
       end
     end
 
