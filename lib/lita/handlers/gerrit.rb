@@ -32,12 +32,12 @@ module Lita
         when 404
           message = "[gerrit] Change ##{change_id} does not exist"
         else
-          raise "[gerrit] Failed to fetch #{change_uri} (#{http_resp.code})"
+          raise "Failed to fetch #{change_uri} (#{http_resp.code})"
         end
 
         response.reply(message)
       rescue Exception => e
-        response.reply("Error: #{e.message}")
+        response.reply("[gerrit] Error: #{e.message}")
       end
 
       #

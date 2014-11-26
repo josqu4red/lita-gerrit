@@ -27,7 +27,7 @@ describe Lita::Handlers::Gerrit, lita_handler: true do
       allow(response).to receive(:body).and_return(body)
 
       send_command("gerrit 42")
-      expect(replies.last).to eq("gerrit: haproxy : migrate beanstalk frontend by John Doe in chef. https://gerrit.example.com/42")
+      expect(replies.last).to eq('[gerrit] [chef] "haproxy : migrate beanstalk frontend" by John Doe. https://gerrit.example.com/42')
     end
 
     it "replies that the issue doesn't exist" do
@@ -35,7 +35,7 @@ describe Lita::Handlers::Gerrit, lita_handler: true do
 
       send_command("gerrit 42")
 
-      expect(replies.last).to eq("Change #42 does not exist")
+      expect(replies.last).to eq("[gerrit] Change #42 does not exist")
     end
 
     it "replies with an exception message" do
@@ -43,7 +43,7 @@ describe Lita::Handlers::Gerrit, lita_handler: true do
 
       send_command("gerrit 42")
 
-      expect(replies.last).to match("Error: Failed to fetch https://gerrit.example.com/a/changes/42 (500)")
+      expect(replies.last).to match("[gerrit] Error: Failed to fetch https://gerrit.example.com/a/changes/42 (500)")
     end
   end
 
