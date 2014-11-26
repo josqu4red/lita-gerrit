@@ -11,8 +11,8 @@ describe Lita::Handlers::Gerrit, lita_handler: true do
     end
   end
 
-  it { routes("get me gerrit 123, please").to(:change_details) }
-  it { doesnt_route("gerrit foo").to(:change_details) }
+  it { is_expected.to route("get me gerrit 123, please").to(:change_details) }
+  it { is_expected.not_to route("gerrit foo").to(:change_details) }
 
   describe "#change_details" do
     let(:response) { double("HTTParty::Response") }
@@ -47,7 +47,7 @@ describe Lita::Handlers::Gerrit, lita_handler: true do
     end
   end
 
-  it { routes_http(:post, "/gerrit/hooks").to(:hook) }
+  it { is_expected.to route_http(:post, "/gerrit/hooks").to(:hook) }
 
   describe "#hook" do
     let(:request) do
@@ -61,8 +61,8 @@ describe Lita::Handlers::Gerrit, lita_handler: true do
     let(:params) { double("Hash") }
   end
 
-  it { routes_http(:post, "/gerrit/build/myroom").to(:build_notification) }
-  it { doesnt_route_http(:post, "/gerrit/build/").to(:build_notification) }
+  it { is_expected.to route_http(:post, "/gerrit/build/myroom").to(:build_notification) }
+  it { is_expected.not_to route_http(:post, "/gerrit/build/").to(:build_notification) }
 
   describe "#build_notification" do
     let(:request) { double("Rack::Request") }

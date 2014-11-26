@@ -2,12 +2,10 @@ module Lita
   module Handlers
     class Gerrit < Handler
 
-      def self.default_config(config)
-        config.url = "https://gerrit.example.com"
-        config.username = "foo"
-        config.password = "bar"
-        config.default_room = nil
-      end
+      config :url, default: "https://gerrit.example.com"
+      config :username, default: "foo"
+      config :password, default: "bar"
+      config :default_room
 
       #
       # Fetch details of a given patchset
@@ -17,12 +15,12 @@ module Lita
 
       def change_details(response)
         change_id = response.matches.flatten.first
-        change_uri = "#{Lita.config.handlers.gerrit.url.chomp("/")}/a/changes/#{change_id}"
-        change_link = "#{Lita.config.handlers.gerrit.url.chomp("/")}/#{change_id}"
+        change_uri = "#{config.url.chomp("/")}/a/changes/#{change_id}"
+        change_link = "#{config.url.chomp("/")}/#{change_id}"
 
         http_resp = HTTParty.get(change_uri, :digest_auth => {
-          username: Lita.config.handlers.gerrit.username,
-          password: Lita.config.handlers.gerrit.password
+          username: config.username,
+          password: config.password
         })
 
         case http_resp.code
@@ -59,8 +57,8 @@ module Lita
 
         if request.params.has_key?("room")
           room = request.params["room"]
-        elsif Lita.config.handlers.gerrit.default_room
-          room = Lita.config.handlers.gerrit.default_room
+        elsif config.default_room
+          room = config.default_room
         else
           raise "Room must be defined. Either fix your hook or specify a default room ('config.handlers.gerrit.default_room')"
         end
